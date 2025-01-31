@@ -11,6 +11,7 @@ function Login() {
                 <label htmlFor="password">Password:</label>
                 <input type="password" id='password' placeholder='Enter your password' />
                 <button>Login</button>
+                <h2>Already have an account? <a href="/register">Login in now</a> </h2>
             </div>
         </div>
     );

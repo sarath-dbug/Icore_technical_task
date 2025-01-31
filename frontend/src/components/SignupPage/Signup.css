@@ -59,6 +59,13 @@
   background-color: #2a36a1;
 }
 
+.sign-form h2 {
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+
 /* media query for mobile responsiveness */
 @media (max-width: 768px) {
   .sign-form {
@@ -87,6 +94,10 @@
 
   .sign-form h1 {
     font-size: 1.25rem;
+  }
+
+  .sign-form h2 {
+    font-size: 0.75rem;
   }
 
   .sign-form input {
