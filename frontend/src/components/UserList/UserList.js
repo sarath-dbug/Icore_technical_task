@@ -19,15 +19,15 @@ const UserList = () => {
     }, [navigate]);
 
 
-     // Clear the error and success message
-     useEffect(() => {
+    // Clear the error and success message
+    useEffect(() => {
         const timer = setTimeout(() => {
             setError("");
             setSuccess("");
-        }, 3000); 
+        }, 3000);
 
         return () => clearTimeout(timer);
-    }, [error, success]); 
+    }, [error, success]);
 
 
     // Fetch users from the backend
@@ -45,6 +45,7 @@ const UserList = () => {
         }
     };
 
+
     // Handle file upload
     const handleUpload = async () => {
         const formData = new FormData();
@@ -60,15 +61,16 @@ const UserList = () => {
             });
 
             setSuccess("File uploaded successfully!");
-            fetchUsers(); 
+            fetchUsers();
         } catch (err) {
             if (err.response.data.message) {
                 setError(err.response.data.message);
             } else {
-                setError("Failed to upload file"); 
-            } 
+                setError("Failed to upload file");
+            }
         }
     };
+
 
     // Handle user deletion
     const handleDelete = async (email) => {
@@ -113,13 +115,14 @@ const UserList = () => {
 
     // Handle logout
     const handleLogout = () => {
-        localStorage.removeItem("token"); // Remove the JWT token
-        navigate("/login"); // Redirect to the login page
+        localStorage.removeItem("token");
+        navigate("/login");
     };
 
     useEffect(() => {
         fetchUsers();
     }, []);
+
 
     return (
         <div className="container">
