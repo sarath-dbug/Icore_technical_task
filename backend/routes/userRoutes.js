@@ -11,7 +11,7 @@ router.use(authMiddleware);
 router.get("/users", getUsers);
 router.delete("/users/deleteUser/:email", deleteUser);
 router.put("/users/updateUser/:email", updateUser);
-router.post("/uploadusers", upload.single("file"), uploadUsers);
+router.post("/upload-users", upload.single("file"), uploadUsers);
 router.get("/export-users", exportUsers);
 
 module.exports = router;

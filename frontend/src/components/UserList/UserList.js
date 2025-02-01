@@ -37,7 +37,7 @@ const UserList = () => {
 
         try {
             const token = localStorage.getItem("token");
-            await axios.post("http://localhost:5000/api/uploadusers", formData, {
+            await axios.post("http://localhost:5000/api/upload-users", formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data",
@@ -68,6 +68,31 @@ const UserList = () => {
         }
     };
 
+
+    // Handle user export
+    const handleExport = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get("http://localhost:5000/api/export-users", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                responseType: "blob",
+            });
+
+            // Download the Excel file
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "users.xlsx");
+            document.body.appendChild(link);
+            link.click();
+        } catch (err) {
+            setError("Failed to export users");
+        }
+    };
+    
+
     // Handle logout
     const handleLogout = () => {
         localStorage.removeItem("token"); // Remove the JWT token
@@ -97,7 +122,9 @@ const UserList = () => {
                 <button onClick={handleUpload}>Upload</button>
             </div>
 
-            <button className="exportButton">Export Users</button>
+            <button className="exportButton" onClick={handleExport}>
+                Export Users
+            </button>
 
             <table className="table">
                 <thead>

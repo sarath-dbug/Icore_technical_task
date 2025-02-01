@@ -18,10 +18,8 @@ function Login() {
                 password,
             });
 
-            // Store the JWT token in local storage
             localStorage.setItem("token", response.data.token);
 
-            // Redirect to the user list page
             navigate("/users");
         } catch (err) {
             setError("Invalid email or password");
