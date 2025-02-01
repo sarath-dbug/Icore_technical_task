@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Signup.css";
@@ -9,6 +9,15 @@ function Signup() {
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setError("");
+        }, 3000);
+
+        return () => clearTimeout(timer);
+    }, [error]);
+
+
     const handleSignup = async (e) => {
         e.preventDefault();
 
@@ -17,11 +26,13 @@ function Signup() {
                 email,
                 password,
             });
-
-            // Redirect to the login page
             navigate("/login");
         } catch (err) {
-            setError("Signup failed. Please try again.");
+            if (err.response && err.response.data && err.response.data.message) {
+                setError(err.response.data.message);
+            } else {
+                setError("Signup failed. Please try again.");
+            }
         }
     };
 

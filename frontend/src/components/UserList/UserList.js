@@ -10,6 +10,26 @@ const UserList = () => {
     const [success, setSuccess] = useState("");
     const navigate = useNavigate();
 
+    // Check if the user is authenticated
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            navigate("/login");
+        }
+    }, [navigate]);
+
+
+     // Clear the error and success message
+     useEffect(() => {
+        const timer = setTimeout(() => {
+            setError("");
+            setSuccess("");
+        }, 3000); 
+
+        return () => clearTimeout(timer);
+    }, [error, success]); 
+
+
     // Fetch users from the backend
     const fetchUsers = async () => {
         try {
@@ -80,7 +100,6 @@ const UserList = () => {
                 responseType: "blob",
             });
 
-            // Download the Excel file
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement("a");
             link.href = url;
@@ -91,7 +110,7 @@ const UserList = () => {
             setError("Failed to export users");
         }
     };
-    
+
 
     // Handle logout
     const handleLogout = () => {
