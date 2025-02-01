@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const AuthUser = require("../models/AuthUser");
+const { validateEmail, validatePassword } = require("../utils/authValidation");
 
 
 
@@ -9,17 +10,9 @@ const register = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({ message: "Invalid email format" });
-        }
-
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&,])[A-Za-z\d@$!%*?&,]{8,}$/;
-        if (!passwordRegex.test(password)) {
-            return res.status(400).json({
-                message: "Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one number, and one symbol.",
-            });
-        }
+        // Validate and transform the data
+        validateEmail(email);
+        validatePassword(password);
 
         const existingUser = await AuthUser.findOne({ email });
         if (existingUser) {
@@ -27,19 +20,15 @@ const register = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        const newUser = new AuthUser({
-            email,
-            password: hashedPassword,
-        });
+        const newUser = new AuthUser({ email, password: hashedPassword });
         await newUser.save();
 
         res.status(201).json({ message: "User registered successfully" });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Server error" });
+        res.status(400).json({ message: err.message || "Server error" });
     }
 };
+
 
 // Login a user
 const login = async (req, res) => {

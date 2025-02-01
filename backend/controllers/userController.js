@@ -1,5 +1,8 @@
 const User = require("../models/User");
 const XLSX = require("xlsx");
+const { uploadUsersValidation } = require("../utils/uploadUsersValidation");
+
+
 
 // Fetch all users
 const getUsers = async (req, res) => {
@@ -11,6 +14,7 @@ const getUsers = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
 
 // Delete user
 const deleteUser = async (req, res) => {
@@ -29,6 +33,7 @@ const deleteUser = async (req, res) => {
         res.status(500).json({ message: "Failed to delete user" });
     }
 };
+
 
 // Update user
 const updateUser = async (req, res) => {
@@ -65,53 +70,27 @@ const uploadUsers = async (req, res) => {
             return res.status(400).json({ message: "No data found in the Excel file" });
         }
 
-        const transformedData = jsonData.map((user) => {
-            if (
-                !user["First Name"] ||
-                !user["Lats Name"] ||
-                !user.Role ||
-                !user.DOB ||
-                !user.Gender ||
-                !user.Email ||
-                !user.Mobile ||
-                !user.City ||
-                !user.State
-            ) {
-                throw new Error("Missing required fields in the Excel file");
-            }
+        // Validate and transform the data
+        const transformedData = jsonData.map((user) => uploadUsersValidation(user));
 
-            const dobParts = user.DOB.split("/");
-            if (dobParts.length !== 3) {
-                throw new Error(`Invalid date format for DOB: ${user.DOB}`);
-            }
+        const uploadedEmails = transformedData.map((user) => user.email);
+        const existingUsers = await User.find({ email: { $in: uploadedEmails } }, { email: 1 });
+        const existingEmails = existingUsers.map((user) => user.email);
 
-            const dob = new Date(`${dobParts[2]}-${dobParts[1]}-${dobParts[0]}`);
+        const newUsers = transformedData.filter((user) => !existingEmails.includes(user.email));
 
-            if (isNaN(dob.getTime())) {
-                throw new Error(`Invalid date for DOB: ${user.DOB}`);
-            }
+        if (newUsers.length === 0) {
+            return res.status(400).json({ message: "All users in the file already exist in the database" });
+        }
 
-            return {
-                first_name: user["First Name"],
-                last_name: user["Lats Name"],
-                role: user.Role,
-                dob: dob,
-                gender: user.Gender,
-                email: user.Email,
-                mobile: user.Mobile.toString(),
-                city: user.City,
-                state: user.State,
-            };
-        });
-
-        await User.insertMany(transformedData);
-
+        await User.insertMany(newUsers);
         res.status(201).json({ message: "Users imported successfully" });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: err.message || "Failed to import users" });
     }
 };
+
 
 // Export users to Excel
 const exportUsers = async (req, res) => {
@@ -156,5 +135,6 @@ const exportUsers = async (req, res) => {
         res.status(500).json({ message: "Failed to export users" });
     }
 };
+
 
 module.exports = { getUsers, uploadUsers, exportUsers, deleteUser, updateUser };

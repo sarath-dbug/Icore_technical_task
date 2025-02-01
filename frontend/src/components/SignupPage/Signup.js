@@ -28,7 +28,7 @@ function Signup() {
             });
             navigate("/login");
         } catch (err) {
-            if (err.response && err.response.data && err.response.data.message) {
+            if (err.response.data.message) {
                 setError(err.response.data.message);
             } else {
                 setError("Signup failed. Please try again.");

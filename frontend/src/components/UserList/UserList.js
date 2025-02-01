@@ -47,11 +47,6 @@ const UserList = () => {
 
     // Handle file upload
     const handleUpload = async () => {
-        if (!file) {
-            setError("Please select a file to upload.");
-            return;
-        }
-
         const formData = new FormData();
         formData.append("file", file);
 
@@ -65,9 +60,13 @@ const UserList = () => {
             });
 
             setSuccess("File uploaded successfully!");
-            fetchUsers(); // Refresh the user list
+            fetchUsers(); 
         } catch (err) {
-            setError("Failed to upload file");
+            if (err.response.data.message) {
+                setError(err.response.data.message);
+            } else {
+                setError("Failed to upload file"); 
+            } 
         }
     };
 
